@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #6a6a6a;
+      --primary-hover: #4b5563;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1.8rem;
+    }
+
+    form.add-form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .add-form input[type="text"] {
+      flex: 1;
+      padding: 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #f9fafb;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .add-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #fff;
+    }
+
+    .add-form button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 1.3rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .add-form button:hover {
+      background: var(--primary-hover);
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1rem;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .task.done input[type="text"] {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .task-form {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 0.5rem;
+    }
+
+    .task-form input[type="text"] {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .task-form input[type="text"]:focus {
+      outline: none;
+      background: #fff;
+      border-radius: 6px;
+      padding-left: 0.3rem;
+    }
+
+    .task-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-form {
+      margin: 0;
+    }
+
+    .icon-button {
+      background: #f3f4f6;
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 0.7rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    .icon-button:hover {
+      background: #e0e7ff;
+      transform: translateY(-1px);
+    }
+
+    .icon-button.delete:hover {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    @media (max-width: 480px) {
+      .add-form {
+        flex-direction: column;
+      }
+
+      .add-form button {
+        width: 100%;
+      }
+
+      .task {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .task-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .task-buttons {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+
+    <!-- Add Task Form -->
+    <form class="add-form" action="/add" method="POST">
+      <input type="text" name="task" placeholder="Add a new task..." required />
+      <button type="submit"><i class="fas fa-plus"></i></button>
+    </form>
+
+    <!-- Task List -->
+    <div class="task-list">
+      <% tasks.forEach(task => { %>
+        <div class="task <%= task.completed ? 'done' : '' %>">
+
+          <!-- Toggle Complete -->
+          <form action="/toggle/<%= task._id %>" method="POST" class="icon-form" title="Toggle Complete">
+            <button type="submit" class="icon-button">
+              <% if (task.completed) { %>
+                <i class="fas fa-check-circle"></i>
+              <% } else { %>
+                <i class="far fa-circle"></i>
+              <% } %>
+            </button>
+          </form>
+
+          <!-- Edit Input + Pen Submit -->
+          <form action="/edit/<%= task._id %>" method="POST" class="task-form">
+            <input type="text" name="updatedTask" value="<%= task.text %>" />
+            <button type="submit" class="icon-button" title="Edit Task">
+              <i class="fas fa-pen"></i>
+            </button>
+          </form>
+
+          <!-- Delete -->
+          <div class="task-buttons">
+            <form action="/delete/<%= task._id %>" method="POST" class="icon-form" title="Delete Task">
+              <button type="submit" class="icon-button delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>
